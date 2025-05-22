@@ -1,8 +1,7 @@
 package com.event.service.model;
 
 import com.event.service.enums.UserRoleType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "ems_user")
 public class User {
     @Id
     private String id;
@@ -20,7 +20,10 @@ public class User {
     private String password;
     private String name;
     private String email;
+
+    @Enumerated(EnumType.STRING)
     private UserRoleType role;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

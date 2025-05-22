@@ -1,9 +1,12 @@
 package com.event.service.service;
 
+import com.event.service.dto.AuthResponse;
 import com.event.service.dto.LoginDTO;
 import com.event.service.model.User;
 import com.event.service.repository.UserRepository;
+import com.event.service.security.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,10 +20,14 @@ import org.springframework.stereotype.Service;
 public class UserService implements UserDetailsService {
 
     @Autowired
+    @Lazy
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JWTService jwtService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,11 +44,14 @@ public class UserService implements UserDetailsService {
     }
     public User registerUser(User user){
         user.setPassword(new BCryptPasswordEncoder(12).encode(user.getPassword()));
-       return   userRepository.save(user);
+        return userRepository.save(user);
     }
 
-    public boolean loginUser(LoginDTO loginDTO){
+    public AuthResponse loginUser(LoginDTO loginDTO){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
-        return authentication.isAuthenticated();
+        if(authentication.isAuthenticated()){
+            return new AuthResponse(jwtService.generateToke(loginDTO.getUsername()), authentication.isAuthenticated());
+        }
+        return new AuthResponse(null, authentication.isAuthenticated());
     }
 }
