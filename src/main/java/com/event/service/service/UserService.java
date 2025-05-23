@@ -50,9 +50,12 @@ public class UserService implements UserDetailsService {
             throw new DuplicateKeyException("Username '" + user.getUsername() + "' already exists.");
         }
 
-        if (userRepository.findUserByEmail(user.getEmail()) != null) {
-            throw new DuplicateKeyException("Email '" + user.getEmail() + "' already exists.");
+        if(user.getEmail() != null){
+            if (userRepository.findUserByEmail(user.getEmail()) != null) {
+                throw new DuplicateKeyException("Email '" + user.getEmail() + "' already exists.");
+            }
         }
+
         String encodedPassword = new BCryptPasswordEncoder(12).encode(user.getPassword());
         user.setId(EventUtil.generateEventId());
         user.setPassword(encodedPassword);
