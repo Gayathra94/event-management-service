@@ -5,8 +5,10 @@ import com.event.service.dto.LoginDTO;
 import com.event.service.model.User;
 import com.event.service.repository.UserRepository;
 import com.event.service.security.JWTService;
+import com.event.service.util.EventUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,7 +45,17 @@ public class UserService implements UserDetailsService {
                 .build();
     }
     public User registerUser(User user){
-        user.setPassword(new BCryptPasswordEncoder(12).encode(user.getPassword()));
+
+        if (userRepository.findUserByUsername(user.getUsername()) != null) {
+            throw new DuplicateKeyException("Username '" + user.getUsername() + "' already exists.");
+        }
+
+        if (userRepository.findUserByEmail(user.getEmail()) != null) {
+            throw new DuplicateKeyException("Email '" + user.getEmail() + "' already exists.");
+        }
+        String encodedPassword = new BCryptPasswordEncoder(12).encode(user.getPassword());
+        user.setId(EventUtil.generateEventId());
+        user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
 
