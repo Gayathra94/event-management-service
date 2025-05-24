@@ -17,7 +17,7 @@ public class EventMapper {
         event.setStartTime(request.getStartTime());
         event.setEndTime(request.getEndTime());
         event.setLocation(request.getLocation());
-        event.setVisibility(request.getEventVisibilityType());
+        event.setVisibility(request.getVisibility());
         event.setCreatedAt(LocalDateTime.now());
         event.setUpdatedAt(LocalDateTime.now());
         return event;
