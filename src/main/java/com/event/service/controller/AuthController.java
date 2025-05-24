@@ -5,12 +5,12 @@ import com.event.service.dto.LoginDTO;
 import com.event.service.model.User;
 import com.event.service.security.JWTService;
 import com.event.service.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,16 +52,16 @@ public class AuthController {
         }
     }
 
-    @GetMapping(value = "getUser")
-    public ResponseEntity<?> getUser(HttpServletRequest request){
-        try {
-            String token = jwtService.extractTokenFromCookie(request);
-            String username = jwtService.extractUserName(token);
-            User user = userService.getUser(username);
-            return ResponseEntity.ok(user);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @GetMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        ResponseCookie cookie = ResponseCookie.from("EMS_COOKIE", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Logged out successfully.");
     }
 
 
