@@ -91,7 +91,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User getUser(String username) {
+    public User getUserDetails(String username) {
         return userRepository.findUserByUsername(username);
     }
 }
