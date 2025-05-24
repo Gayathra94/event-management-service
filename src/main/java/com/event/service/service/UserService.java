@@ -9,7 +9,12 @@ import com.event.service.util.EventUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -62,11 +69,29 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public AuthResponse loginUser(LoginDTO loginDTO){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
-        if(authentication.isAuthenticated()){
-            return new AuthResponse(jwtService.generateToke(loginDTO.getUsername()), authentication.isAuthenticated());
+    public ResponseEntity<?> loginUser(LoginDTO loginDTO){
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
+            String token = jwtService.generateToken(loginDTO.getUsername());
+
+            Duration maxAge = Duration.ofDays(1);
+            ResponseCookie cookie = ResponseCookie.from("EMS_COOKIE", token)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(maxAge)
+                    .sameSite("Strict")
+                    .build();
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new AuthResponse("F", true));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username or password is incorrect. Please try again.");
+        } catch (Exception ex) {
+            // Log the exception details (optional)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body("An unexpected error occurred. Please contact support.");
         }
-        return new AuthResponse(null, authentication.isAuthenticated());
+    }
+
+    public User getUser(String username) {
+        return userRepository.findUserByUsername(username);
     }
 }

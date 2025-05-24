@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,12 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 
-    public String generateToke(String username){
+    public String generateToken(String username){
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims().add(claims).subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 30 * 1000 ))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 minutes
                 .and()
                 .signWith(generateKey()).compact();
     }
@@ -56,5 +57,16 @@ public class JWTService {
         String username = extractUserName(token);
         System.out.println("*********"+username);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if (cookie.getName().equals("EMS_COOKIE")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }
