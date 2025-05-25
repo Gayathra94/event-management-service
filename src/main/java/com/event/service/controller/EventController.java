@@ -44,6 +44,8 @@ public class EventController {
             List<EventDTO> events = eventService.getListUpcomingEvents();
             return ResponseEntity.ok(events);
         }catch (Exception e){
+            e.printStackTrace();
+            String message = e.getMessage();
             ErrorResponse errorResponse = new ErrorResponse("1002", messageSource.getMessage("error.load.upcoming.event", null, locale));
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }

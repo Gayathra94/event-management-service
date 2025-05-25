@@ -110,6 +110,7 @@ public class EventServiceImpl implements EventService {
                 attendanceRepository.save(attendance);
             }
         }catch (Exception e){
+            e.printStackTrace();
             throw new ApplicationException("1005", "error.update.event");
         }
     }
