@@ -1,6 +1,7 @@
 package com.event.service.dto;
 
 import com.event.service.enums.EventVisibilityType;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,6 +15,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateEventRequest {
+
+  @Nullable
+  private String id;
 
   @NotBlank(message = "{CreateEventRequest.title.required}")
   @Size(min = 10, max = 100, message = "{CreateEventRequest.title.length.invalid}")

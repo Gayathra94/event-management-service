@@ -2,6 +2,7 @@ package com.event.service.service;
 
 import com.event.service.dto.AuthResponse;
 import com.event.service.dto.LoginDTO;
+import com.event.service.dto.UserDTO;
 import com.event.service.model.User;
 import com.event.service.repository.UserRepository;
 import com.event.service.security.JWTService;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -91,7 +91,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User getUserDetails(String username) {
-        return userRepository.findUserByUsername(username);
+    public UserDTO getUserDetails(String username) {
+        User user = userRepository.findUserByUsername(username);
+        return new UserDTO(user);
     }
 }

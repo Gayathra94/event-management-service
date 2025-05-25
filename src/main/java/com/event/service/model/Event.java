@@ -1,25 +1,28 @@
 package com.event.service.model;
 
 import com.event.service.enums.EventVisibilityType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "ems_event")
+@ToString(exclude = {"user", "attendances"})
 public class Event {
 
   @Id
   private String id;
   private String title;
   private String description;
-  private String hostId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private String location;
@@ -27,4 +30,13 @@ public class Event {
   private EventVisibilityType visibility;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+
+  @ManyToOne
+  @JoinColumn(name = "host_id", nullable = false)
+  private User user;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Attendance> attendances;
+
+
 }
