@@ -3,6 +3,7 @@ package com.event.service.service.impl;
 import com.event.service.dto.AttendanceDTO;
 import com.event.service.dto.CreateEventRequest;
 import com.event.service.dto.EventDTO;
+import com.event.service.dto.EventResponse;
 import com.event.service.exception.ApplicationException;
 import com.event.service.mapper.EventMapper;
 import com.event.service.model.Attendance;
@@ -47,9 +48,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventDTO> getListUpcomingEvents() {
-        List<Event> events = eventRepository.findByStartTimeAfter(LocalDateTime.now());
-        return events.stream().map(event -> new EventDTO(event)).collect(Collectors.toList());
+    public EventResponse getListUpcomingEvents(int page, int size) {
+        int offset = page * size;
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> events = eventRepository.findUpcomingEventsWithPagination(now, size, offset);
+        List<EventDTO> eventDTOList  = events.stream().map(event -> new EventDTO(event)).collect(Collectors.toList());
+        long total = eventRepository.countUpcomingEvents(now);
+        return new EventResponse(eventDTOList, total);
 
     }
 
@@ -75,23 +80,21 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-
     @Override
     @Transactional
     public void deleteEvent(String eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> new ApplicationException("1004", "event.not.found"));
-            eventRepository.delete(event);
+            int size = event.getAttendances().size();
+            eventRepository.delete(event); // safer than deleteById
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ApplicationException("1005", "error.delete.event");
         }
 
     }
 
-
     @Override
     public void attendEvent(AttendanceDTO attendanceDTO) {
-
         try {
             Event event = eventRepository.findById(attendanceDTO.getEventId()).orElseThrow();
             User user = userRepository.findById(attendanceDTO.getUserId()).orElseThrow();
@@ -110,7 +113,6 @@ public class EventServiceImpl implements EventService {
                 attendanceRepository.save(attendance);
             }
         }catch (Exception e){
-            e.printStackTrace();
             throw new ApplicationException("1005", "error.update.event");
         }
     }

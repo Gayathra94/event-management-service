@@ -1,9 +1,6 @@
 package com.event.service.controller;
 
-import com.event.service.dto.AttendanceDTO;
-import com.event.service.dto.CreateEventRequest;
-import com.event.service.dto.ErrorResponse;
-import com.event.service.dto.EventDTO;
+import com.event.service.dto.*;
 import com.event.service.exception.ApplicationException;
 import com.event.service.model.Event;
 import com.event.service.service.EventService;
@@ -39,10 +36,10 @@ public class EventController {
     }
 
     @GetMapping(value = "/getListUpcomingEvents")
-    public ResponseEntity<?> getListUpcomingEvents(Locale locale){
+    public ResponseEntity<?> getListUpcomingEvents(Locale locale, @RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "5") int size) {
         try {
-            List<EventDTO> events = eventService.getListUpcomingEvents();
-            return ResponseEntity.ok(events);
+            EventResponse eventResponse = eventService.getListUpcomingEvents(page, size);
+            return ResponseEntity.ok(eventResponse);
         }catch (Exception e){
             e.printStackTrace();
             String message = e.getMessage();

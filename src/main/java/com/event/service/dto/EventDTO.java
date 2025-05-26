@@ -1,12 +1,15 @@
 package com.event.service.dto;
 
+import com.event.service.enums.AttendanceType;
 import com.event.service.enums.EventVisibilityType;
+import com.event.service.model.Attendance;
 import com.event.service.model.Event;
 import com.event.service.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -23,6 +26,10 @@ public class EventDTO {
     private LocalDateTime updatedAt;
     private String hostId;
     private String hostName;
+    private int totalRows;
+    private int goingCount;
+    private int maybeCount;
+    private int declinedCount;
 
     public EventDTO(Event event) {
         this.id = event.getId();
@@ -40,5 +47,23 @@ public class EventDTO {
             this.hostId = host.getId();
             this.hostName = host.getName();
         }
+
+        Set<Attendance> attendances = event.getAttendances();
+        if (!attendances.isEmpty()) {
+            for (Attendance attendance:attendances){
+
+                if (attendance.getStatus() == AttendanceType.GOING) {
+                    this.goingCount++;
+                }
+                if (attendance.getStatus() == AttendanceType.MAYBE) {
+                    this.maybeCount++;
+                }
+                if (attendance.getStatus() == AttendanceType.DECLINED) {
+                    this.declinedCount++;
+                }
+            }
+        }
     }
+
+
 }
