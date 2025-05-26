@@ -85,9 +85,9 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(String eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> new ApplicationException("1004", "event.not.found"));
-            int size = event.getAttendances().size();
-            eventRepository.delete(event); // safer than deleteById
+            eventRepository.delete(event);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ApplicationException("1005", "error.delete.event");
         }
 
