@@ -8,12 +8,13 @@ import com.event.service.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
-public class EventDTO {
+public class EventDTO implements Serializable {
 
     private String id;
     private String title;

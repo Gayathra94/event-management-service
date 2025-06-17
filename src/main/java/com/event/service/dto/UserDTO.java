@@ -4,11 +4,13 @@ import com.event.service.enums.UserRoleType;
 import com.event.service.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class UserDTO {
+public class UserDTO implements Serializable {
 
     private String id;
     private String username;

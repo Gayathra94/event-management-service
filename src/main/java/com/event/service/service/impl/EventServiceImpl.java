@@ -15,6 +15,7 @@ import com.event.service.repository.EventRepository;
 import com.event.service.repository.UserRepository;
 import com.event.service.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,8 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+
+    //@Cacheable(value = "upcomingEvents", key = "'page=' + #page + ',size=' + #size")
     @Override
     public EventResponse getListUpcomingEvents(int page, int size) {
         int offset = page * size;

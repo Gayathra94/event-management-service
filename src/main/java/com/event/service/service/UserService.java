@@ -72,22 +72,36 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<?> loginUser(LoginDTO loginDTO){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
+
             String token = jwtService.generateToken(loginDTO.getUsername());
 
-            Duration maxAge = Duration.ofDays(1);
-            ResponseCookie cookie = ResponseCookie.from("EMS_COOKIE", token)
+
+            ResponseCookie clearOldCookie = ResponseCookie.from("EMS_COOKIE", "")
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(maxAge)
+                    .maxAge(0) // This deletes the cookie
                     .sameSite("Strict")
                     .build();
-            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new AuthResponse("F", true));
+
+
+            ResponseCookie newCookie = ResponseCookie.from("EMS_COOKIE", token)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(Duration.ofDays(1))
+                    .sameSite("Strict")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, clearOldCookie.toString()) // delete old one
+                    .header(HttpHeaders.SET_COOKIE, newCookie.toString())      // set new one
+                    .body(new AuthResponse("F", true));
+
         } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username or password is incorrect. Please try again.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)  .body("Username or password is incorrect.");
         } catch (Exception ex) {
-            // Log the exception details (optional)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body("An unexpected error occurred. Please contact support.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body("An unexpected error occurred.");
         }
     }
 

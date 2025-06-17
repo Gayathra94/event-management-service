@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "ems_user")
 @ToString(exclude = {"events", "attendances"})
-public class User {
+public class User implements Serializable {
     @Id
     private String id;
     private String username;

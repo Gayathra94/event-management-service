@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "ems_attendance")
 @ToString // no exclude parameter here
-public class Attendance {
+public class Attendance implements Serializable {
 
   @EmbeddedId
   private AttendanceId id = new AttendanceId();
